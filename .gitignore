@@ -41,3 +41,7 @@ logs/
 *.png
 *.yml
 *.lprof
+
+models/
+eval_tb_logs/
+output.txt

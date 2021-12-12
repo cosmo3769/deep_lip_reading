@@ -75,7 +75,7 @@ def add_time_line(vid, width = 4):
   time_dim, h, w, c = vid.shape
   # import ipdb; ipdb.set_trace(context=20)
   pixels_per_t_step = w/float(time_dim)
-  for t in xrange(time_dim):
+  for t in range(time_dim):
     img = vid[t]
     fill_width = int(pixels_per_t_step*t)
     if fill_width > 0:
@@ -100,8 +100,8 @@ def add_subs_to_vid_tensor_cv(vid, subs, scale=1):
   pos = (10, h-10)
 
   for (from_t, to_t), txt in subs:
-    for t in xrange(from_t, to_t):
-      txt = txt.encode('utf-8')
+    for t in range(from_t, to_t):
+      txt = txt
       img = vid[t]
       (text_width, text_height) = cv2.getTextSize(txt,
                                                   font,
@@ -124,13 +124,13 @@ def align_subs_from_attention_matrix(attention, preds):
     m, n = grid_orig.shape
     grid = grid_orig.copy()
 
-    for i in xrange(m - 2, -1, -1):
+    for i in range(m - 2, -1, -1):
       grid[i,n - 1] += grid[i+1, n - 1]
-    for j in xrange(n - 2, -1, -1):
+    for j in range(n - 2, -1, -1):
       grid[m - 1, j] += grid[m - 1, j+1]
 
-    for i in xrange(m - 2, -1, -1):
-      for j in xrange(n - 2, -1, -1):
+    for i in range(m - 2, -1, -1):
+      for j in range(n - 2, -1, -1):
         grid[i, j] += max(grid[i + 1, j], grid[i, j + 1])
 
     path = [(0,0)]
@@ -154,10 +154,10 @@ def align_subs_from_attention_matrix(attention, preds):
   space_indices = np.array([i for i, x in enumerate(preds) if x == '-'])
   frs = [0] + (space_indices + 1).tolist()
   tos = space_indices.tolist() + [len(preds)]
-  words = preds.split('-')
+  words = preds.decode().split('-')
   best_path = find_best_path(attention)
   path_mask = np.zeros_like(attention, dtype=int)
-  path_mask[zip(*best_path)] = 1
+  path_mask[tuple(zip(*best_path))] = 1
   subs = []
   for fr_dec, to_dec, txt in zip(frs, tos, words):
     tups = [t_enc for t_enc, t_dec in best_path if t_dec >= fr_dec and t_dec < to_dec]
